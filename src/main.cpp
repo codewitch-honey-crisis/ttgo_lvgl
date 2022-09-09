@@ -95,13 +95,13 @@ void setup()
     lv_ttf_t ttf;
     lv_ttf_open(&ttf,&file);
     lv_ttf_create_font(&font,&ttf,50,NULL);
-    lv_style_init(&style);
-    lv_style_set_text_font(&style, &font);  /*Set a larger font*/
+    // lv_style_init(&style);
+    //lv_style_set_text_font(&style, &font);  /*Set a larger font*/
     /* Create simple label */
     lv_obj_t *label = lv_label_create( lv_scr_act() );
     lv_style_selector_t selector=0;
 
-    lv_obj_set_style_text_font(label,&font,selector);
+    //lv_obj_set_style_text_font(label,&font,selector);
 
     lv_label_set_text( label, LVGL_Arduino.c_str() );
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
@@ -124,6 +124,6 @@ void setup()
 
 void loop()
 {
-    //lv_timer_handler(); /* let the GUI do its work */
+    lv_timer_handler(); /* let the GUI do its work */
     delay( 5 );
 }

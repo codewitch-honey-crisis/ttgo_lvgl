@@ -4742,7 +4742,7 @@ lv_ttf_res_t lv_ttf_open(lv_ttf_t* out_ttf, lv_fs_file_t* file) {
 }
 static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next)
 {
-   //printf("Get glyph dsc\n");
+   printf("Get glyph dsc\n");
    
     stbtt_fontinfo* info = (stbtt_fontinfo*)font->dsc;
     lv_ttf_font_info_t* fi = (lv_ttf_font_info_t*)font->user_data;
