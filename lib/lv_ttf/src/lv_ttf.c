@@ -4762,8 +4762,8 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
       k=0;
     }
     dsc_out->adv_w = k;        /*Horizontal space required by the glyph in [px]*/
-    dsc_out->box_h = x2-x1+1;         /*Height of the bitmap in [px]*/
-    dsc_out->box_w = y2-y1+1;         /*Width of the bitmap in [px]*/
+    dsc_out->box_w = x2-x1+1;         /*Height of the bitmap in [px]*/
+    dsc_out->box_h = y2-y1+1;         /*Width of the bitmap in [px]*/
     dsc_out->ofs_x = back;         /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = 0;         /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp   = 8;         /*Bits per pixel: 1/2/4/8*/
