@@ -51,11 +51,6 @@ void setup()
 
     lv_init();
     
-    cbfs_register(0,'Q',Ubuntu_data,sizeof(Ubuntu_data));
-    lv_fs_file_t f;
-    lv_fs_open(&f,"Q:/",LV_FS_MODE_RD);
-
-
     tft.begin();          /* TFT init */
     tft.setRotation( 3 ); /* Landscape orientation, flipped */
 
@@ -87,7 +82,8 @@ void setup()
     cbfs_register(0,'Q',Ubuntu_data,sizeof(Ubuntu_data));
     lv_fs_open(&file,"Q:/",LV_FS_MODE_RD);
     lv_ttf_open(&ttf,&file);
-    lv_ttf_create_font(&lfont,&ttf,50,NULL);
+    // create a font with a line height of 50
+    lv_ttf_create_font(&lfont,&ttf,20,NULL);
     // lv_style_init(&style);
     //lv_style_set_text_font(&style, &font);  /*Set a larger font*/
     /* Create simple label */

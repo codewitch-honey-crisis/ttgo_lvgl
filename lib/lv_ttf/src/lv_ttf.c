@@ -4760,10 +4760,10 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     stbtt_GetGlyphHMetrics(info,g1,&advw,&lsb);
     int k = stbtt_GetGlyphKernAdvance(info,g1,g2);
     dsc_out->adv_w = ((float)advw+k)*fi->scale;        /*Horizontal space required by the glyph in [px]*/
-    dsc_out->box_w = (x2-x1+1);         /*Height of the bitmap in [px]*/
-    dsc_out->box_h = (y2-y1+1);         /*Width of the bitmap in [px]*/
+    dsc_out->box_w = (x2-x1+1);         /*width of the bitmap in [px]*/
+    dsc_out->box_h = (y2-y1+1);         /*height of the bitmap in [px]*/
     dsc_out->ofs_x = x1;         /*X offset of the bitmap in [pf]*/
-    dsc_out->ofs_y = 0;//y1+dsc_out->box_h;         /*Y offset of the bitmap measured from the as line*/
+    dsc_out->ofs_y = y1+dsc_out->box_h-(fi->ascent*fi->scale);         /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp   = 8;         /*Bits per pixel: 1/2/4/8*/
    //printf("ch: %c, g1: %d, k: %d, adv_w: %d, box_w: %d, box_h: %d, ofs_x: %d, ofs_y: %d\n",(char)unicode_letter,g1,(int)k,(int)dsc_out->adv_w,(int)dsc_out->box_w,(int)dsc_out->box_h,(int)dsc_out->ofs_x,(int)dsc_out->ofs_y);
     return true;                /*true: glyph found; false: glyph was not found*/
@@ -4787,7 +4787,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
    static size_t buffer_size = 0;
    int g1=stbtt_FindGlyphIndex(info,(int)unicode_letter);
     int x1,y1,x2,y2;
-    stbtt_GetGlyphBitmapBoxSubpixel( info,g1,fi->scale,fi->scale,0,0,&x1,&y1,&x2,&y2);
+    stbtt_GetGlyphBitmapBox( info,g1,fi->scale,fi->scale,&x1,&y1,&x2,&y2);
     int w = x2-x1+1;
     int h = y2-y1+1;
    if(buffer==NULL) {
