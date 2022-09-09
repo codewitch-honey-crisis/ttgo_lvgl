@@ -92,7 +92,7 @@ void setup()
 
     lv_obj_set_style_text_font(label,&lfont,selector);
 
-    lv_label_set_text( label, LVGL_Arduino.c_str() );
+    lv_label_set_text( label, "Hello\nworld!");
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 #else
     /* Try an example from the lv_examples Arduino library
