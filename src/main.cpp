@@ -1,5 +1,7 @@
+
 #include <lvgl.h>
 #include <TFT_eSPI.h>
+
 /*If you want to use the LVGL examples,
   make sure to install the lv_examples Arduino library
   and uncomment the following line.
@@ -18,14 +20,11 @@ static lv_color_t buf[ screenWidth * 10 ];
 
 TFT_eSPI tft; /* TFT instance */
 
-#if LV_USE_LOG != 0
-/* Serial debugging */
-void my_print(const char * buf)
-{
-    Serial.printf(buf);
-    Serial.flush();
-}
-#endif
+lv_fs_file_t file;
+lv_style_t style;
+lv_font_t lfont;
+lv_ttf_t ttf;
+
 
 /* Display flushing */
 void my_disp_flush( lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p )
@@ -51,13 +50,11 @@ void setup()
     Serial.println( "I am LVGL_Arduino" );
 
     lv_init();
+    
     cbfs_register(0,'Q',Ubuntu_data,sizeof(Ubuntu_data));
     lv_fs_file_t f;
     lv_fs_open(&f,"Q:/",LV_FS_MODE_RD);
 
-#if LV_USE_LOG != 0
-    lv_log_register_print_cb( my_print ); /* register print function for debugging */
-#endif
 
     tft.begin();          /* TFT init */
     tft.setRotation( 3 ); /* Landscape orientation, flipped */
@@ -88,20 +85,16 @@ void setup()
 
 #if 1
     cbfs_register(0,'Q',Ubuntu_data,sizeof(Ubuntu_data));
-    lv_fs_file_t file;
     lv_fs_open(&file,"Q:/",LV_FS_MODE_RD);
-    lv_style_t style;
-    lv_font_t font;
-    lv_ttf_t ttf;
     lv_ttf_open(&ttf,&file);
-    lv_ttf_create_font(&font,&ttf,50,NULL);
+    lv_ttf_create_font(&lfont,&ttf,50,NULL);
     // lv_style_init(&style);
     //lv_style_set_text_font(&style, &font);  /*Set a larger font*/
     /* Create simple label */
     lv_obj_t *label = lv_label_create( lv_scr_act() );
     lv_style_selector_t selector=0;
 
-    //lv_obj_set_style_text_font(label,&font,selector);
+    lv_obj_set_style_text_font(label,&lfont,selector);
 
     lv_label_set_text( label, LVGL_Arduino.c_str() );
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
