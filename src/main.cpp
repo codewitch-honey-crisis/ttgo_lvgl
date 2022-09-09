@@ -82,8 +82,8 @@ void setup()
     cbfs_register(0,'Q',Ubuntu_data,sizeof(Ubuntu_data));
     lv_fs_open(&file,"Q:/",LV_FS_MODE_RD);
     lv_ttf_open(&ttf,&file);
-    // create a font with a line height of 50
-    lv_ttf_create_font(&lfont,&ttf,20,NULL);
+    // create a font with a line height of 40
+    lv_ttf_create_font(&lfont,&ttf,40,NULL);
     // lv_style_init(&style);
     //lv_style_set_text_font(&style, &font);  /*Set a larger font*/
     /* Create simple label */
@@ -92,7 +92,7 @@ void setup()
 
     lv_obj_set_style_text_font(label,&lfont,selector);
 
-    lv_label_set_text( label, "Hello\nworld!");
+    lv_label_set_text( label, "honey\nthe\nmonster");
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 #else
     /* Try an example from the lv_examples Arduino library
