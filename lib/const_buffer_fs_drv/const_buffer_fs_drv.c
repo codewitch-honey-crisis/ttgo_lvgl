@@ -41,7 +41,6 @@ static lv_fs_res_t read_cb(lv_fs_drv_t* drv,void* handle,void* buf,uint32_t btr,
     memcpy(buf,info->data+info->position,btr);
 #endif
     info->position+=(size_t)btr;
-    info->position+=btr;
     *br = btr;
     return LV_FS_RES_OK;
 }

@@ -1,6 +1,6 @@
 #define STB_RECT_PACK_IMPLEMENTATION
 #define STBRP_STATIC
-//#include <stdio.h>
+#include <stdio.h>
 #include <lv_ttf.h>
 #include "stb_rect_pack.h"
 #define STBTT_STATIC
@@ -82,42 +82,42 @@
    static stbtt_uint8 read_uint8(lv_fs_file_t *stream)
    {
       uint8_t result;
-      uint32_t r;
-      lv_fs_read(stream,&result,1,&r);
+      uint32_t br;
+      lv_fs_read(stream, &result, 1,&br);
       return result;
    }
    static stbtt_int8 read_int8(lv_fs_file_t *stream)
    {
       int8_t result;
-      uint32_t r;
-      lv_fs_read(stream,(uint8_t *)&result, 1,&r);
+      uint32_t br;
+      lv_fs_read(stream, (uint8_t *)&result, 1,&br);
       return result;
    }
    static stbtt_uint16 read_uint16(lv_fs_file_t *stream)
    {
       uint8_t result[2];
-      uint32_t r;
-      lv_fs_read(stream,&result, 2,&r);
+      uint32_t br;
+      lv_fs_read(stream, result, 2,&br);
       return result[0] * 256 + result[1];
    }
    static stbtt_int16 read_int16(lv_fs_file_t *stream)
    {
       uint8_t result[2];
-      uint32_t r;
-      lv_fs_read(stream,&result, 2,&r);
+      uint32_t br;
+      lv_fs_read(stream, result, 2,&br);
       return result[0] * 256 + result[1];
    }
    static stbtt_uint32 read_uint32(lv_fs_file_t *stream)
    {
       uint8_t result[4];
-      uint32_t r;
-      lv_fs_read(stream,&result, 4,&r);
+      uint32_t br;
+      lv_fs_read(stream, result, 4,&br);
       return (result[0] << 24) + (result[1] << 16) + (result[2] << 8) + result[3];
    }
    /*static stbtt_int32 read_int32(lv_fs_file_t *stream)
    {
       uint8_t result[4];
-      stream->read(result, 4);
+      lv_fs_read(stream, result, 4);
       return (result[0] << 24) + (result[1] << 16) + (result[2] << 8) + result[3];
    }*/
 
@@ -130,7 +130,7 @@
    {
       if (b->cursor >= b->size)
          return 0;
-      lv_fs_seek(b->stream,b->cursor+b->offset,LV_FS_SEEK_SET);
+      lv_fs_seek(b->stream, b->cursor + b->offset,LV_FS_SEEK_SET);
       ++b->cursor;
       return read_uint8(b->stream);
    }
@@ -139,7 +139,7 @@
    {
       if (b->cursor >= b->size)
          return 0;
-      lv_fs_seek(b->stream,b->cursor+b->offset,LV_FS_SEEK_SET);
+      lv_fs_seek(b->stream, b->cursor + b->offset,LV_FS_SEEK_SET);
       return read_uint8(b->stream);
    }
 
@@ -342,7 +342,7 @@
 
    static stbtt_uint32 stbtt__find_table(lv_fs_file_t *stream, stbtt_uint32 fontstart, const char *tag)
    {
-      lv_fs_seek(stream,fontstart+4,LV_FS_SEEK_SET);
+      lv_fs_seek(stream, fontstart + 4,LV_FS_SEEK_SET);
       stbtt_int32 num_tables = read_uint16(stream);
       stbtt_uint32 tabledir = fontstart + 12;
       stbtt_int32 i;
@@ -350,12 +350,12 @@
       for (i = 0; i < num_tables; ++i)
       {
          stbtt_uint32 loc = tabledir + 16 * i;
-         lv_fs_seek(stream,loc,LV_FS_SEEK_SET);
-         uint32_t r;
-         lv_fs_read(stream,data,4,&r);
+         lv_fs_seek(stream, loc,LV_FS_SEEK_SET);
+         uint32_t br;
+         lv_fs_read(stream, data, 4,&br);
          if (stbtt_tag(data, tag))
          {
-            lv_fs_seek(stream,loc+8,LV_FS_SEEK_SET);
+            lv_fs_seek(stream, loc + 8,LV_FS_SEEK_SET);
             return read_uint32(stream);
          }
       }
@@ -425,7 +425,7 @@
          t = stbtt__find_table(info->stream, info->fontstart, "SVG ");
          if (t)
          {
-            info->stream->seek(t + 2);
+            lv_fs_seek(info->stream, t + 2,LV_FS_SEEK_SET);
             stbtt_uint32 offset = read_uint32(info->stream);
             info->svg = t + offset;
          }
@@ -523,7 +523,7 @@
       t = stbtt__find_table(stream, fontstart, "maxp");
       if (t)
       {
-         lv_fs_seek(stream,t+4,LV_FS_SEEK_SET);
+         lv_fs_seek(stream, t + 4,LV_FS_SEEK_SET);
          info->numGlyphs = read_uint16(stream);
       }
       else
@@ -535,14 +535,14 @@
       // find a cmap encoding table we understand *now* to avoid searching
       // later. (todo: could make this installable)
       // the same regardless of glyph.
-      lv_fs_seek(stream,cmap+2,LV_FS_SEEK_SET);
+      lv_fs_seek(stream, cmap + 2,LV_FS_SEEK_SET);
       numTables = read_uint16(stream);
       info->index_map = 0;
       for (i = 0; i < numTables; ++i)
       {
          stbtt_uint32 encoding_record = cmap + 4 + 8 * i;
          // find an encoding we understand:
-         lv_fs_seek(stream,encoding_record,LV_FS_SEEK_SET);
+         lv_fs_seek(stream, encoding_record,LV_FS_SEEK_SET);
          switch (read_uint16(stream))
          {
          case STBTT_PLATFORM_ID_MICROSOFT:
@@ -558,14 +558,14 @@
          case STBTT_PLATFORM_ID_UNICODE:
             // Mac/iOS has these
             // all the encodingIDs are unicode, so we don't bother to check it
-            lv_fs_seek(stream,encoding_record+4,LV_FS_SEEK_SET);
+            lv_fs_seek(stream, encoding_record + 4,LV_FS_SEEK_SET);
             info->index_map = cmap + read_uint32(stream);
             break;
          }
       }
       if (info->index_map == 0)
          return 0;
-      lv_fs_seek(stream,info->head+50,LV_FS_SEEK_SET);
+      lv_fs_seek(stream, info->head + 50,LV_FS_SEEK_SET);
       info->indexToLocFormat = read_uint16(stream);
       return 1;
    }
@@ -573,26 +573,26 @@
    STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codepoint)
    {
       stbtt_uint32 index_map = info->index_map;
-      lv_fs_seek(info->stream,index_map,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, index_map,LV_FS_SEEK_SET);
       stbtt_uint16 format = read_uint16(info->stream);
       if (format == 0)
       { // apple byte encoding
          stbtt_int32 bytes = read_uint16(info->stream);
          if (unicode_codepoint < bytes - 6)
          {
-            lv_fs_seek(info->stream,index_map+6+unicode_codepoint,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, index_map + 6 + unicode_codepoint,LV_FS_SEEK_SET);
             return read_uint8(info->stream);
          }
          return 0;
       }
       else if (format == 6)
       {
-         lv_fs_seek(info->stream,index_map+6,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, index_map + 6,LV_FS_SEEK_SET);
          stbtt_uint32 first = read_uint16(info->stream);
          stbtt_uint32 count = read_uint16(info->stream);
          if ((stbtt_uint32)unicode_codepoint >= first && (stbtt_uint32)unicode_codepoint < first + count)
          {
-            lv_fs_seek(info->stream,index_map+10+(unicode_codepoint-first)*2,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, index_map + 10 + (unicode_codepoint - first) * 2,LV_FS_SEEK_SET);
             return read_uint16(info->stream);
          }
          return 0;
@@ -604,7 +604,7 @@
       }
       else if (format == 4)
       { // standard mapping for windows fonts: binary search collection of ranges
-         lv_fs_seek(info->stream,index_map+6,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, index_map + 6,LV_FS_SEEK_SET);
          stbtt_uint16 segcount = read_uint16(info->stream) >> 1;
          stbtt_uint16 searchRange = read_uint16(info->stream) >> 1;
          stbtt_uint16 entrySelector = read_uint16(info->stream);
@@ -619,7 +619,7 @@
 
          // they lie from endCount .. endCount + segCount
          // but searchRange is the nearest power of two, so...
-         lv_fs_seek(info->stream,search+rangeShift*2,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, search + rangeShift * 2,LV_FS_SEEK_SET);
          if (unicode_codepoint >= read_uint16(info->stream))
             search += rangeShift * 2;
 
@@ -629,7 +629,7 @@
          {
             stbtt_uint16 end;
             searchRange >>= 1;
-            lv_fs_seek(info->stream,search+searchRange*2,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, search + searchRange * 2,LV_FS_SEEK_SET);
             end = read_uint16(info->stream);
             if (unicode_codepoint > end)
                search += searchRange * 2;
@@ -642,24 +642,24 @@
             stbtt_uint16 item = (stbtt_uint16)((search - endCount) >> 1);
 
             // STBTT_assert(unicode_codepoint <= ttUSHORT(data + endCount + 2*item));
-            lv_fs_seek(info->stream,index_map+14+segcount*2+2+2*item,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, index_map + 14 + segcount * 2 + 2 + 2 * item,LV_FS_SEEK_SET);
             start = read_uint16(info->stream);
             if (unicode_codepoint < start)
                return 0;
-            lv_fs_seek(info->stream,index_map+14+segcount*6+2+2*item,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, index_map + 14 + segcount * 6 + 2 + 2 * item,LV_FS_SEEK_SET);
             offset = read_uint16(info->stream);
             if (offset == 0)
             {
-               lv_fs_seek(info->stream,index_map+14+segcount*4+2+2*item,LV_FS_SEEK_SET);
+               lv_fs_seek(info->stream, index_map + 14 + segcount * 4 + 2 + 2 * item,LV_FS_SEEK_SET);
                return (stbtt_uint16)(unicode_codepoint + read_int16(info->stream));
             }
-            lv_fs_seek(info->stream,offset + (unicode_codepoint - start) * 2 + index_map + 14 + segcount * 6 + 2 + 2 * item,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, offset + (unicode_codepoint - start) * 2 + index_map + 14 + segcount * 6 + 2 + 2 * item,LV_FS_SEEK_SET);
             return read_uint16(info->stream);
          }
       }
       else if (format == 12 || format == 13)
       {
-         lv_fs_seek(info->stream,index_map+12,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, index_map + 12,LV_FS_SEEK_SET);
          stbtt_uint32 ngroups = read_uint32(info->stream);
          stbtt_int32 low, high;
          low = 0;
@@ -668,7 +668,7 @@
          while (low < high)
          {
             stbtt_int32 mid = low + ((high - low) >> 1); // rounds down, so low <= mid < high
-            lv_fs_seek(info->stream,index_map+15+mid*12,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, index_map + 15 + mid * 12,LV_FS_SEEK_SET);
             stbtt_uint32 start_char = read_uint32(info->stream);
             stbtt_uint32 end_char = read_uint32(info->stream);
             if ((stbtt_uint32)unicode_codepoint < start_char)
@@ -718,13 +718,13 @@
 
       if (info->indexToLocFormat == 0)
       {
-         lv_fs_seek(info->stream,info->loca+glyph_index*2,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, info->loca + glyph_index * 2,LV_FS_SEEK_SET);
          g1 = info->glyf + read_uint16(info->stream) * 2;
          g2 = info->glyf + read_uint16(info->stream) * 2;
       }
       else
       {
-         lv_fs_seek(info->stream,info->loca+glyph_index*4,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, info->loca + glyph_index * 4,LV_FS_SEEK_SET);
          g1 = info->glyf + read_uint32(info->stream);
          g2 = info->glyf + read_uint32(info->stream);
       }
@@ -745,7 +745,7 @@
          int g = stbtt__GetGlyfOffset(info, glyph_index);
          if (g < 0)
             return 0;
-         lv_fs_seek(info->stream,g+2,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, g + 2,LV_FS_SEEK_SET);
          int xx0 = read_int16(info->stream), yy0 = read_int16(info->stream), xx1 = read_int16(info->stream), yy1 = read_int16(info->stream);
          if (x0)
             *x0 = xx0;
@@ -773,7 +773,7 @@
       g = stbtt__GetGlyfOffset(info, glyph_index);
       if (g < 0)
          return 1;
-      info->stream->seek(g);
+      lv_fs_seek(info->stream, g,LV_FS_SEEK_SET);
       numberOfContours = read_int16(info->stream);
       return numberOfContours == 0;
    }*/
@@ -809,7 +809,7 @@
 
       if (g < 0)
          return 0;
-      lv_fs_seek(info->stream,g,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, g,LV_FS_SEEK_SET);
       numberOfContours = read_int16(info->stream);
 
       if (numberOfContours > 0)
@@ -820,11 +820,12 @@
          //stbtt_uint8 *points;
          stbtt_uint32 points_offs;
          endPtsOfContours = (g + 10);
-         lv_fs_seek(info->stream,g+10+numberOfContours*2,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, g + 10 + numberOfContours * 2,LV_FS_SEEK_SET);
          ins = read_uint16(info->stream);
          points_offs = g + 10 + numberOfContours * 2 + 2 + ins;
          //points = data + points_offs;
-         lv_fs_seek(info->stream,endPtsOfContours+numberOfContours*2-2,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, endPtsOfContours + numberOfContours * 2 - 2,LV_FS_SEEK_SET);
+
          n = 1 + read_uint16(info->stream);
 
          m = n + 2 * numberOfContours; // a loose bound on how many vertices we might need
@@ -842,7 +843,7 @@
          off = m - n; // starting offset for uninterpreted data, regardless of how m ends up being calculated
 
          // first load flags
-         lv_fs_seek(info->stream,points_offs,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, points_offs,LV_FS_SEEK_SET);
          for (i = 0; i < n; ++i)
          {
             if (flagcount == 0)
@@ -869,7 +870,7 @@
             if (flags & 2)
             {
                // TODO: Find out why we have to seek here
-               lv_fs_seek(info->stream,points_offs,LV_FS_SEEK_SET);
+               lv_fs_seek(info->stream, points_offs,LV_FS_SEEK_SET);
                stbtt_int16 dx = read_uint8(info->stream);
                ++points_offs;
                x += (flags & 16) ? dx : -dx; // ???
@@ -879,7 +880,7 @@
                if (!(flags & 16))
                {
                   // TODO: Find out why we have to seek here
-                  lv_fs_seek(info->stream,points_offs,LV_FS_SEEK_SET);
+                  lv_fs_seek(info->stream, points_offs,LV_FS_SEEK_SET);
                   x = x + read_int16(info->stream);
                   points_offs += 2;
                }
@@ -895,7 +896,7 @@
             if (flags & 4)
             {
                // TODO: Find out why we have to seek here
-               lv_fs_seek(info->stream,points_offs,LV_FS_SEEK_SET);
+               lv_fs_seek(info->stream, points_offs,LV_FS_SEEK_SET);
                stbtt_int16 dy = read_uint8(info->stream);
                ++points_offs;
                y += (flags & 32) ? dy : -dy; // ???
@@ -905,7 +906,7 @@
                if (!(flags & 32))
                {
                   // TODO: Find out why we have to seek here
-                  lv_fs_seek(info->stream,points_offs,LV_FS_SEEK_SET);
+                  lv_fs_seek(info->stream, points_offs,LV_FS_SEEK_SET);
                   y = y + read_int16(info->stream);
                   points_offs += 2;
                }
@@ -956,8 +957,8 @@
                }
                stbtt_setvertex(&vertices[num_vertices++], STBTT_vmove, sx, sy, 0, 0);
                was_off = 0;
-               lv_fs_seek(info->stream,endPtsOfContours+j*2,LV_FS_SEEK_SET);
-               
+               lv_fs_seek(info->stream, endPtsOfContours + j * 2,LV_FS_SEEK_SET);
+
                next_move = 1 + read_uint16(info->stream);
                ++j;
             }
@@ -996,7 +997,7 @@
             int comp_num_verts = 0, i;
             stbtt_vertex *comp_verts = 0, *tmp = 0;
             float mtx[6] = {1, 0, 0, 1, 0, 0}, m, n;
-            lv_fs_seek(info->stream,comp,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, comp,LV_FS_SEEK_SET);
             flags = read_int16(info->stream);
             comp += 2;
             gidx = read_int16(info->stream);
@@ -1004,7 +1005,7 @@
 
             if (flags & 2)
             { // XY values
-               lv_fs_seek(info->stream,comp,LV_FS_SEEK_SET);
+               lv_fs_seek(info->stream, comp,LV_FS_SEEK_SET);
                if (flags & 1)
                { // shorts
                   mtx[4] = read_int16(info->stream);
@@ -1025,7 +1026,7 @@
                // @TODO handle matching point
                STBTT_assert(0);
             }
-            lv_fs_seek(info->stream,comp,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, comp,LV_FS_SEEK_SET);
             if (flags & (1 << 3))
             { // WE_HAVE_A_SCALE
                mtx[0] = mtx[3] = read_int16(info->stream) / 16384.0f;
@@ -1583,19 +1584,18 @@
 
    STBTT_DEF void stbtt_GetGlyphHMetrics(const stbtt_fontinfo *info, int glyph_index, int *advanceWidth, int *leftSideBearing)
    {
-      lv_fs_seek(info->stream,info->head+34,LV_FS_SEEK_SET);
-      
+      lv_fs_seek(info->stream, info->hhea + 34,LV_FS_SEEK_SET);
       stbtt_uint16 numOfLongHorMetrics = read_uint16(info->stream);
       if (glyph_index < numOfLongHorMetrics)
       {
          if (advanceWidth)
          {
-            lv_fs_seek(info->stream,info->hmtx+4*glyph_index,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, info->hmtx + 4 * glyph_index,LV_FS_SEEK_SET);
             *advanceWidth = read_int16(info->stream);
          }
          if (leftSideBearing)
          {
-            lv_fs_seek(info->stream,info->hmtx+4*glyph_index+2,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, info->hmtx + 4 * glyph_index + 2,LV_FS_SEEK_SET);
             *leftSideBearing = read_int16(info->stream);
          }
       }
@@ -1603,12 +1603,12 @@
       {
          if (advanceWidth)
          {
-            lv_fs_seek(info->stream,info->hmtx+4*(numOfLongHorMetrics-1),LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, info->hmtx + 4 * (numOfLongHorMetrics - 1),LV_FS_SEEK_SET);
             *advanceWidth = read_int16(info->stream);
          }
          if (leftSideBearing)
          {
-            lv_fs_seek(info->stream,info->hmtx+4*numOfLongHorMetrics+2*(glyph_index-numOfLongHorMetrics),LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, info->hmtx + 4 * numOfLongHorMetrics + 2 * (glyph_index - numOfLongHorMetrics),LV_FS_SEEK_SET);
             *leftSideBearing = read_int16(info->stream);
          }
       }
@@ -1619,11 +1619,11 @@
       // we only look at the first table. it must be 'horizontal' and format 0.
       if (!info->kern)
          return 0;
-      info->stream->seek(info->kern + 2);
+      lv_fs_seek(info->stream, info->kern + 2,LV_FS_SEEK_SET);
 
       if (read_uint16(info->stream) < 1) // number of tables, need at least 1
          return 0;
-      info->stream->seek(info->kern + 8);
+      lv_fs_seek(info->stream, info->kern + 8,LV_FS_SEEK_SET);
       if (read_uint16(info->stream) != 1) // horizontal flag must be set in format
          return 0;
 
@@ -1637,10 +1637,10 @@
       // we only look at the first table. it must be 'horizontal' and format 0.
       if (!info->kern)
          return 0;
-      info->stream->seek(info->kern + 2);
+      lv_fs_seek(info->stream, info->kern + 2,LV_FS_SEEK_SET);
       if (read_uint16(info->stream) < 1) // number of tables, need at least 1
          return 0;
-      info->stream->seek(info->kern + 8);
+      lv_fs_seek(info->stream, info->kern + 8,LV_FS_SEEK_SET);
       if (read_uint16(info->stream) != 1) // horizontal flag must be set in format
          return 0;
       length = read_uint16(info->stream);
@@ -1649,7 +1649,7 @@
 
       for (k = 0; k < length; k++)
       {
-         info->stream->seek(18 + (k * 6));
+         lv_fs_seek(info->stream, 18 + (k * 6),LV_FS_SEEK_SET);
          table[k].glyph1 = read_uint16(info->stream);
          table[k].glyph2 = read_uint16(info->stream);
          table[k].advance = read_uint16(info->stream);
@@ -1666,10 +1666,10 @@
       // we only look at the first table. it must be 'horizontal' and format 0.
       if (!info->kern)
          return 0;
-      lv_fs_seek(info->stream,info->kern+2,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, info->kern + 2,LV_FS_SEEK_SET);
       if (read_uint16(info->stream) < 1) // number of tables, need at least 1
          return 0;
-      lv_fs_seek(info->stream,info->kern+8,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, info->kern + 8,LV_FS_SEEK_SET);
       if (read_uint16(info->stream) != 1) // horizontal flag must be set in format
          return 0;
       l = 0;
@@ -1678,7 +1678,7 @@
       while (l <= r)
       {
          m = (l + r) >> 1;
-         lv_fs_seek(info->stream,info->kern+18+(m*6),LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, info->kern + 18 + (m * 6),LV_FS_SEEK_SET);
          straw = read_uint32(info->stream);
          if (needle < straw)
             r = m - 1;
@@ -1686,7 +1686,7 @@
             l = m + 1;
          else
          {
-            lv_fs_seek(info->stream,info->kern+22+(m*6),LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, info->kern + 22 + (m * 6),LV_FS_SEEK_SET);
             return read_int16(info->stream);
          }
       }
@@ -1764,14 +1764,13 @@
    }*/
    static stbtt_int32 stbtt__GetCoverageIndex(const stbtt_fontinfo *info, stbtt_uint32 coverageTable, int glyph)
    {
-      lv_fs_seek(info->stream,coverageTable,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, coverageTable,LV_FS_SEEK_SET);
       stbtt_uint16 coverageFormat = read_uint16(info->stream);
       switch (coverageFormat)
       {
       case 1:
       {
-         lv_fs_seek(info->stream,coverageTable+2,LV_FS_SEEK_SET);
-         
+         lv_fs_seek(info->stream, coverageTable+2,LV_FS_SEEK_SET);
          stbtt_uint16 glyphCount = read_uint16(info->stream);
 
          // Binary search.
@@ -1782,7 +1781,7 @@
             stbtt_uint32 glyphArray = coverageTable + 4;
             stbtt_uint16 glyphID;
             m = (l + r) >> 1;
-            lv_fs_seek(info->stream,glyphArray+2*m,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, glyphArray + 2 * m,LV_FS_SEEK_SET);
             glyphID = read_uint16(info->stream);
             straw = glyphID;
             if (needle < straw)
@@ -1799,7 +1798,7 @@
 
       case 2:
       {
-         lv_fs_seek(info->stream,coverageTable+2,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, coverageTable+2,LV_FS_SEEK_SET);
          stbtt_uint16 rangeCount = read_uint16(info->stream);
          stbtt_uint32 rangeArray = coverageTable + 4;
 
@@ -1812,10 +1811,10 @@
             stbtt_uint32 rangeRecord;
             m = (l + r) >> 1;
             rangeRecord = rangeArray + 6 * m;
-            lv_fs_seek(info->stream,rangeRecord,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, rangeRecord,LV_FS_SEEK_SET);
             strawStart = read_uint16(info->stream);
             strawEnd = read_uint16(info->stream);
-            //long pos = info->stream->seek(0,io::seek_origin::current);
+            //long pos = lv_fs_seek(info->stream, 0,io::seek_origin::current);
             startCoverageIndex = read_uint16(info->stream);
             if (needle < strawStart)
                r = m - 1;
@@ -1823,7 +1822,7 @@
                l = m + 1;
             else
             {
-               //info->stream->seek(rangeRecord+6); // ???
+               //lv_fs_seek(info->stream, rangeRecord+6,LV_FS_SEEK_SET); // ???
                //stbtt_uint16 startCoverageIndex = read_uint16(info->stream);
                return startCoverageIndex + glyph - strawStart;
             }
@@ -1901,7 +1900,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
 
    static stbtt_int32 stbtt__GetGlyphClass(const stbtt_fontinfo *info, stbtt_uint32 classDefTable, int glyph)
    {
-      lv_fs_seek(info->stream,classDefTable,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, classDefTable,LV_FS_SEEK_SET);
       stbtt_uint16 classDefFormat = read_uint16(info->stream);
       switch (classDefFormat)
       {
@@ -1913,7 +1912,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
 
          if (glyph >= startGlyphID && glyph < startGlyphID + glyphCount)
          {
-            lv_fs_seek(info->stream,classDef1ValueArray+2*(glyph-startGlyphID),LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, classDef1ValueArray + 2 * (glyph - startGlyphID),LV_FS_SEEK_SET);
             return (stbtt_int32)read_uint16(info->stream);
          }
          classDefTable = classDef1ValueArray + 2 * glyphCount;
@@ -1933,7 +1932,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
             stbtt_uint32 classRangeRecord;
             m = (l + r) >> 1;
             classRangeRecord = classRangeRecords + 6 * m;
-            lv_fs_seek(info->stream,classRangeRecord,LV_FS_SEEK_SET);
+            lv_fs_seek(info->stream, classRangeRecord,LV_FS_SEEK_SET);
             strawStart = read_uint16(info->stream);
             strawEnd = read_uint16(info->stream);
             if (needle < strawStart)
@@ -1975,25 +1974,25 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
          return 0;
 
       data = info->gpos;
-      lv_fs_seek(info->stream,data,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, data,LV_FS_SEEK_SET);
       if (read_uint16(info->stream) != 1)
          return 0; // Major version 1
       if (read_uint16(info->stream) != 0)
          return 0; // Minor version 0
-      lv_fs_seek(info->stream,data+8,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, data+8,LV_FS_SEEK_SET);
       lookupListOffset = read_uint16(info->stream);
       lookupList = data + lookupListOffset;
-      lv_fs_seek(info->stream,lookupList,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, lookupList,LV_FS_SEEK_SET);
       lookupCount = read_uint16(info->stream);
 
       for (i = 0; i < lookupCount; ++i)
       {
-         lv_fs_seek(info->stream,lookupList+2+2*i,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, lookupList+2+2*i,LV_FS_SEEK_SET);
          stbtt_uint16 lookupOffset = read_uint16(info->stream);
          stbtt_uint32 lookupTable = lookupList + lookupOffset;
-         lv_fs_seek(info->stream,lookupTable,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, lookupTable,LV_FS_SEEK_SET);
          stbtt_uint16 lookupType = read_uint16(info->stream);
-         lv_fs_seek(info->stream,lookupTable+4,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, lookupTable+4,LV_FS_SEEK_SET);
          stbtt_uint16 subTableCount = read_uint16(info->stream);
          stbtt_uint32 subTableOffsets = lookupTable + 6;
          if(lookupType!=2) {
@@ -2004,10 +2003,10 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
             stbtt_int32 sti;
             for (sti = 0; sti < subTableCount; sti++)
             {
-               lv_fs_seek(info->stream,subTableOffsets+2*sti,LV_FS_SEEK_SET);
+               lv_fs_seek(info->stream, subTableOffsets+2*sti,LV_FS_SEEK_SET);
                stbtt_uint16 subtableOffset = read_uint16(info->stream);
                stbtt_uint32 table = lookupTable + subtableOffset;
-               lv_fs_seek(info->stream,table,LV_FS_SEEK_SET);
+               lv_fs_seek(info->stream, table,LV_FS_SEEK_SET);
                stbtt_uint16 posFormat = read_uint16(info->stream);
                stbtt_uint16 coverageOffset = read_uint16(info->stream);
                stbtt_int32 coverageIndex = stbtt__GetCoverageIndex(info, table + coverageOffset, glyph1);
@@ -2020,15 +2019,15 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
                {
                   stbtt_int32 l, r, m;
                   int straw, needle;
-                  lv_fs_seek(info->stream,table+4,LV_FS_SEEK_SET);
+                  lv_fs_seek(info->stream, table+4,LV_FS_SEEK_SET);
                   stbtt_uint16 valueFormat1 = read_uint16(info->stream);
                   stbtt_uint16 valueFormat2 = read_uint16(info->stream);
                   stbtt_int32 valueRecordPairSizeInBytes = 2;
                   stbtt_uint16 pairSetCount = read_uint16(info->stream);
-                  lv_fs_seek(info->stream,table+10+2*coverageIndex,LV_FS_SEEK_SET);
+                  lv_fs_seek(info->stream, table+10+2*coverageIndex,LV_FS_SEEK_SET);
                   stbtt_uint16 pairPosOffset = read_uint16(info->stream);
                   stbtt_uint32 pairValueTable = table + pairPosOffset;
-                  lv_fs_seek(info->stream,pairValueTable,LV_FS_SEEK_SET);
+                  lv_fs_seek(info->stream, pairValueTable,LV_FS_SEEK_SET);
                   stbtt_uint16 pairValueCount = read_uint16(info->stream);
                   stbtt_uint32 pairValueArray = pairValueTable + 2;
                   // TODO: Support more formats.
@@ -2053,7 +2052,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
                      stbtt_uint32 pairValue;
                      m = (l + r) >> 1;
                      pairValue = pairValueArray + (2 + valueRecordPairSizeInBytes) * m;
-                     lv_fs_seek(info->stream,pairValue,LV_FS_SEEK_SET);
+                     lv_fs_seek(info->stream, pairValue,LV_FS_SEEK_SET);
                      secondGlyph = read_uint16(info->stream);
                      straw = secondGlyph;
                      if (needle < straw)
@@ -2071,7 +2070,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
 
                case 2:
                {
-                  lv_fs_seek(info->stream,table+4,LV_FS_SEEK_SET);
+                  lv_fs_seek(info->stream, table+4,LV_FS_SEEK_SET);
                   stbtt_uint16 valueFormat1 = read_uint16(info->stream);
                   stbtt_uint16 valueFormat2 = read_uint16(info->stream);
                   
@@ -2079,7 +2078,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
                   stbtt_uint16 classDef2Offset = read_uint16(info->stream);
                   int glyph1class = stbtt__GetGlyphClass(info,table + classDef1Offset, glyph1);
                   int glyph2class = stbtt__GetGlyphClass(info,table + classDef2Offset, glyph2);
-                  lv_fs_seek(info->stream,table+12,LV_FS_SEEK_SET);
+                  lv_fs_seek(info->stream, table+12,LV_FS_SEEK_SET);
                   stbtt_uint16 class1Count = read_uint16(info->stream);
                   stbtt_uint16 class2Count = read_uint16(info->stream);
                   STBTT_assert(glyph1class < class1Count);
@@ -2097,7 +2096,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
                   {
                      stbtt_uint32 class1Records = table + 16;
                      stbtt_uint32 class2Records = class1Records + 2 * (glyph1class * class2Count);
-                     lv_fs_seek(info->stream,class2Records+2*glyph2class,LV_FS_SEEK_SET);
+                     lv_fs_seek(info->stream, class2Records+2*glyph2class,LV_FS_SEEK_SET);
                      stbtt_int16 xAdvance = read_int16(info->stream);
                      return xAdvance;
                   }
@@ -2160,17 +2159,17 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
    {
       if (ascent)
       {
-         lv_fs_seek(info->stream,info->hhea+4,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, info->hhea + 4,LV_FS_SEEK_SET);
          *ascent = read_int16(info->stream);
       }
       if (descent)
       {
-         lv_fs_seek(info->stream,info->hhea+6,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, info->hhea + 6,LV_FS_SEEK_SET);
          *descent = read_int16(info->stream);
       }
       if (lineGap)
       {
-         lv_fs_seek(info->stream,info->hhea+8,LV_FS_SEEK_SET);
+         lv_fs_seek(info->stream, info->hhea + 8,LV_FS_SEEK_SET);
          *lineGap = read_int16(info->stream);
       }
    }
@@ -2180,7 +2179,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
       int tab = stbtt__find_table(info->stream, info->fontstart, "OS/2");
       if (!tab)
          return 0;
-      info->stream->seek(tab + 68);
+      lv_fs_seek(info->stream, tab + 68,LV_FS_SEEK_SET);
       if (typoAscent)
          *typoAscent = read_int16(info->stream);
       if (typoDescent)
@@ -2192,7 +2191,7 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
 
    STBTT_DEF void stbtt_GetFontBoundingBox(const stbtt_fontinfo *info, int *x0, int *y0, int *x1, int *y1)
    {
-      lv_fs_seek(info->stream,info->head+36,LV_FS_SEEK_SET);
+      lv_fs_seek(info->stream, info->head + 36,LV_FS_SEEK_SET);
       *x0 = read_int16(info->stream);
       *y0 = read_int16(info->stream);
       *x1 = read_int16(info->stream);
@@ -2201,15 +2200,14 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
 
    STBTT_DEF float stbtt_ScaleForPixelHeight(const stbtt_fontinfo *info, float height)
    {
-      lv_fs_seek(info->stream,info->hhea+4,LV_FS_SEEK_SET);
-      
+      lv_fs_seek(info->stream, info->hhea + 4,LV_FS_SEEK_SET);
       int fheight = read_int16(info->stream) - read_int16(info->stream);
       return (float)height / fheight;
    }
 
    /*STBTT_DEF float stbtt_ScaleForMappingEmToPixels(const stbtt_fontinfo *info, float pixels)
    {
-      info->stream->seek(info->head + 18);
+      lv_fs_seek(info->stream, info->head + 18,LV_FS_SEEK_SET);
       int unitsPerEm = read_uint16(info->stream);
       return pixels / unitsPerEm;
    }*/
@@ -2223,14 +2221,14 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
    {
       int i;
       stbtt_uint32 svg_doc_list = stbtt__get_svg((stbtt_fontinfo *)info);
-      info->stream->seek(svg_doc_list);
+      lv_fs_seek(info->stream, svg_doc_list,LV_FS_SEEK_SET);
       int numEntries = read_uint16(info->stream);
       stbtt_uint32 svg_docs = svg_doc_list + 2;
 
       for (i = 0; i < numEntries; i++)
       {
          stbtt_uint32 svg_doc = svg_docs + (12 * i);
-         info->stream->seek(svg_doc);
+         lv_fs_seek(info->stream, svg_doc,LV_FS_SEEK_SET);
          if ((gl >= read_uint16(info->stream)) && (gl <= read_uint16(info->stream)))
             return svg_doc;
       }
@@ -2247,12 +2245,12 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
       svg_doc = stbtt_FindSVGDoc(info, gl);
       if (svg_doc != 0)
       {
-         info->stream->seek(svg_doc + 4);
+         lv_fs_seek(info->stream, svg_doc + 4,LV_FS_SEEK_SET);
          stbtt_uint32 offs = read_uint32(info->stream);
-         info->stream->seek(info->svg + offs);
-         info->stream->read((uint8_t *)buffer, buffer_length);
+         lv_fs_seek(info->stream, info->svg + offs,LV_FS_SEEK_SET);
+         info->lv_fs_read(stream, (uint8_t *)buffer, buffer_length);
          buffer[buffer_length - 1] = 0;
-         info->stream->seek(svg_doc + 8);
+         lv_fs_seek(info->stream, svg_doc + 8,LV_FS_SEEK_SET);
          return read_uint32(info->stream);
       }
       else
@@ -2300,10 +2298,10 @@ static stbtt_int32 stbtt__GetGlyphClass(stbtt_uint8 *classDefTable, int glyph)
       }
    }
 
-   /*STBTT_DEF void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo *font, int glyph, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
+   STBTT_DEF void stbtt_GetGlyphBitmapBox(const stbtt_fontinfo *font, int glyph, float scale_x, float scale_y, int *ix0, int *iy0, int *ix1, int *iy1)
    {
       stbtt_GetGlyphBitmapBoxSubpixel(font, glyph, scale_x, scale_y, 0.0f, 0.0f, ix0, iy0, ix1, iy1);
-   }*/
+   }
 
    STBTT_DEF void stbtt_GetCodepointBitmapBoxSubpixel(const stbtt_fontinfo *font, int codepoint, float scale_x, float scale_y, float shift_x, float shift_y, int *ix0, int *iy0, int *ix1, int *iy1)
    {
@@ -4571,19 +4569,19 @@ STBTT_DEF void stbtt_GetScaledFontVMetrics(const unsigned char *fontdata, int in
       stbtt_uint32 nm = stbtt__find_table(info->stream, info->fontstart, "name");
       if (!nm)
          return 0;
-      info->stream->seek(nm + 2);
+      lv_fs_seek(info->stream, nm + 2,LV_FS_SEEK_SET);
       count = read_uint16(info->stream);
       stringOffset = nm + read_uint16(info->stream);
       for (i = 0; i < count; ++i)
       {
          //stbtt_uint32 loc = nm + 6 + 12 * i;
-         //info->stream->seek(loc);
+         //lv_fs_seek(info->stream, loc,LV_FS_SEEK_SET);
          if (platformID == read_uint16(info->stream) && encodingID == read_uint16(info->stream) && languageID == read_uint16(info->stream) && nameID == read_uint16(info->stream))
          {
             length = read_uint16(info->stream);
-            info->stream->seek(stringOffset + read_uint16(info->stream));
+            lv_fs_seek(info->stream, stringOffset + read_uint16(info->stream),LV_FS_SEEK_SET);
             result[result_len - 1] = 0;
-            return info->stream->read((uint8_t *)result, result_len > length ? length : result_len - 1);
+            return info->lv_fs_read(stream, (uint8_t *)result, result_len > length ? length : result_len - 1);
          }
       }
       return 0;
@@ -4750,24 +4748,23 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     lv_ttf_font_info_t* fi = (lv_ttf_font_info_t*)font->user_data;
     int g1=stbtt_FindGlyphIndex(info,(int)unicode_letter);
     int x1,y1,x2,y2;
-    stbtt_GetGlyphBitmapBoxSubpixel(info,g1,fi->scale,fi->scale,0,0,&x1,&y1,&x2,&y2);
+    //stbtt_GetGlyphBitmapBoxSubpixel(info,g1,fi->scale,fi->scale,0,0,);
+    stbtt_GetGlyphBitmapBox(info,g1,fi->scale,fi->scale,&x1,&y1,&x2,&y2);
+    //printf("%c = (%d, %d)-(%d, %d)\n",(char)unicode_letter, x1,y1,x2,y2);
     int g2=0;
     if(unicode_letter_next!=0) {
       g2=stbtt_FindGlyphIndex(info,(int)unicode_letter_next);
     }
-    int k = stbtt_GetGlyphKernAdvance(info,g1,g2)*fi->scale;
-    int back = 0;
-    if(k<0) {
-      back = k;
-      k=0;
-    }
-    dsc_out->adv_w = k;        /*Horizontal space required by the glyph in [px]*/
-    dsc_out->box_w = x2-x1+1;         /*Height of the bitmap in [px]*/
-    dsc_out->box_h = y2-y1+1;         /*Width of the bitmap in [px]*/
-    dsc_out->ofs_x = back;         /*X offset of the bitmap in [pf]*/
-    dsc_out->ofs_y = 0;         /*Y offset of the bitmap measured from the as line*/
+    int advw,lsb;
+    stbtt_GetGlyphHMetrics(info,g1,&advw,&lsb);
+    int k = stbtt_GetGlyphKernAdvance(info,g1,g2);
+    dsc_out->adv_w = ((float)advw+k)*fi->scale;        /*Horizontal space required by the glyph in [px]*/
+    dsc_out->box_w = (x2-x1+1);         /*Height of the bitmap in [px]*/
+    dsc_out->box_h = (y2-y1+1);         /*Width of the bitmap in [px]*/
+    dsc_out->ofs_x = x1;         /*X offset of the bitmap in [pf]*/
+    dsc_out->ofs_y = y1+dsc_out->box_h;         /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp   = 8;         /*Bits per pixel: 1/2/4/8*/
-
+   printf("ch: %c, k: %d, adv_w: %d, box_w: %d, box_h: %d, ofs_x: %d, ofs_y: %d\n",(char)unicode_letter,(int)k,(int)dsc_out->adv_w,(int)dsc_out->box_w,(int)dsc_out->box_h,(int)dsc_out->ofs_x,(int)dsc_out->ofs_y);
     return true;                /*true: glyph found; false: glyph was not found*/
 }
 typedef struct lv_ttf_render_state {
@@ -4780,7 +4777,7 @@ static int ttf_render_cb(int x,int y, int c,void*state) {
 }
 static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
 {
-   //printf("get glyph bmp\n");
+   printf("get glyph bmp\n");
    stbtt_fontinfo* info = (stbtt_fontinfo*)font->dsc;
     lv_ttf_font_info_t* fi = (lv_ttf_font_info_t*)font->user_data;
     
@@ -4788,7 +4785,7 @@ static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t 
    static size_t buffer_size = 0;
    int g1=stbtt_FindGlyphIndex(info,(int)unicode_letter);
     int x1,y1,x2,y2;
-    stbtt_GetGlyphBitmapBoxSubpixel(info,g1,fi->scale,fi->scale,0,0,&x1,&y1,&x2,&y2);
+    stbtt_GetGlyphBitmapBoxSubpixel( info,g1,fi->scale,fi->scale,0,0,&x1,&y1,&x2,&y2);
     int w = x2-x1+1;
     int h = y2-y1+1;
    if(buffer==NULL) {

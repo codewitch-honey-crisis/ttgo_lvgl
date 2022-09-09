@@ -100,9 +100,9 @@ void setup()
     /* Create simple label */
     lv_obj_t *label = lv_label_create( lv_scr_act() );
     lv_style_selector_t selector=0;
-    
+
     lv_obj_set_style_text_font(label,&font,selector);
-    
+
     lv_label_set_text( label, LVGL_Arduino.c_str() );
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 #else
