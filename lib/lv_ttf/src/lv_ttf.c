@@ -4748,6 +4748,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     lv_ttf_font_info_t* fi = (lv_ttf_font_info_t*)font->user_data;
     int g1=stbtt_FindGlyphIndex(info,(int)unicode_letter);
     int x1,y1,x2,y2;
+    
     //stbtt_GetGlyphBitmapBoxSubpixel(info,g1,fi->scale,fi->scale,0,0,);
     stbtt_GetGlyphBitmapBox(info,g1,fi->scale,fi->scale,&x1,&y1,&x2,&y2);
     //printf("%c = (%d, %d)-(%d, %d)\n",(char)unicode_letter, x1,y1,x2,y2);
@@ -4764,7 +4765,7 @@ static bool ttf_get_glyph_dsc_cb(const lv_font_t * font, lv_font_glyph_dsc_t * d
     dsc_out->ofs_x = x1;         /*X offset of the bitmap in [pf]*/
     dsc_out->ofs_y = y1+dsc_out->box_h;         /*Y offset of the bitmap measured from the as line*/
     dsc_out->bpp   = 8;         /*Bits per pixel: 1/2/4/8*/
-   printf("ch: %c, k: %d, adv_w: %d, box_w: %d, box_h: %d, ofs_x: %d, ofs_y: %d\n",(char)unicode_letter,(int)k,(int)dsc_out->adv_w,(int)dsc_out->box_w,(int)dsc_out->box_h,(int)dsc_out->ofs_x,(int)dsc_out->ofs_y);
+   printf("ch: %c, g1: %d, k: %d, adv_w: %d, box_w: %d, box_h: %d, ofs_x: %d, ofs_y: %d\n",(char)unicode_letter,g1,(int)k,(int)dsc_out->adv_w,(int)dsc_out->box_w,(int)dsc_out->box_h,(int)dsc_out->ofs_x,(int)dsc_out->ofs_y);
     return true;                /*true: glyph found; false: glyph was not found*/
 }
 typedef struct lv_ttf_render_state {
@@ -4774,6 +4775,7 @@ typedef struct lv_ttf_render_state {
 static int ttf_render_cb(int x,int y, int c,void*state) {
    lv_ttf_render_state_t* rs = (lv_ttf_render_state_t*)state;
    rs->bmp[y*rs->width+x]=c;
+   return 0;
 }
 static const uint8_t * ttf_get_glyph_bitmap_cb(const lv_font_t * font, uint32_t unicode_letter)
 {
