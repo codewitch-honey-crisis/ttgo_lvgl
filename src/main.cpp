@@ -8,7 +8,7 @@
 #include <lv_examples.h>
 */
 #include <lv_demo.h>
-#include "const_buffer_fs_drv.h"
+#include "lv_fs_cbfs.h"
 #include "Ubuntu.hpp"
 #include "lv_ttf.h"
 /*Change to your screen resolution*/
@@ -79,7 +79,9 @@ void setup()
     //lv_indev_drv_register( &indev_drv );
 
 #if 1
-    cbfs_register(0,'Q',Ubuntu_data,sizeof(Ubuntu_data));
+    const uint8_t* data = Ubuntu_data;
+    const size_t data_size = sizeof(Ubuntu_data);
+    lv_fs_cbfs_register(0,'Q',data,data_size);
     lv_fs_open(&file,"Q:/",LV_FS_MODE_RD);
     lv_ttf_open(&ttf,&file);
     // create a font with a line height of 40

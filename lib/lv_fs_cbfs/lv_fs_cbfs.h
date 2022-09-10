@@ -7,7 +7,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void cbfs_register(size_t slot,char drive,const void* data, size_t size);
+void lv_fs_init(size_t slot,char drive,const void* data, size_t size);
 #ifdef __cplusplus
 }
 #endif

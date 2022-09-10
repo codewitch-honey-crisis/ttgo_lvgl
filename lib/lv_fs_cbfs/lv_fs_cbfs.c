@@ -1,5 +1,5 @@
-#include <lvgl.h>
-#include "const_buffer_fs_drv.h"
+#include "../../../lvgl.h"
+#include "lv_fs_cbfs.h"
 #if defined(ARDUINO) && !defined(ESP32)
 #include <avr/pgmspace.h>
 #endif
@@ -89,7 +89,7 @@ static lv_fs_res_t dir_read_cb(lv_fs_drv_t* drv,void* handle,char* fn) {
 static lv_fs_res_t dir_close_cb(lv_fs_drv_t* drv,void* handle) {
     return LV_FS_RES_NOT_IMP;
 }
-void cbfs_register(size_t slot,char drive,const void* data, size_t size) {
+void lv_fs_cbfs_init(size_t slot,char drive,const void* data, size_t size) {
     if(slot<0 || slot>=CONST_BUFFER_FS_DRV_MAX_SLOTS) {
         return;
     }

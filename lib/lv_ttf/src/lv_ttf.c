@@ -91,18 +91,21 @@ static stbtt_int8 read_int8(lv_fs_file_t *stream) {
     lv_fs_read(stream, (uint8_t *)&result, 1, &br);
     return result;
 }
+// TODO: Support big endian procs
 static stbtt_uint16 read_uint16(lv_fs_file_t *stream) {
     uint8_t result[2];
     uint32_t br;
     lv_fs_read(stream, result, 2, &br);
     return result[0] * 256 + result[1];
 }
+// TODO: Support big endian procs
 static stbtt_int16 read_int16(lv_fs_file_t *stream) {
     uint8_t result[2];
     uint32_t br;
     lv_fs_read(stream, result, 2, &br);
     return result[0] * 256 + result[1];
 }
+// TODO: Support big endian procs
 static stbtt_uint32 read_uint32(lv_fs_file_t *stream) {
     uint8_t result[4];
     uint32_t br;
@@ -631,6 +634,8 @@ STBTT_DEF int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codep
         return 0;  // not found
     }
     // @TODO
+    LV_LOG_ERROR("Glyph not found %d (%c)\n",unicode_codepoint,(char)unicode_codepoint);
+    //printf("Glyph not found %d (%c)\n",unicode_codepoint,(char)unicode_codepoint);
     STBTT_assert(0);
     return 0;
 }
