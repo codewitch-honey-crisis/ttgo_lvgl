@@ -1,4 +1,4 @@
-#include "../../../lvgl.h"
+#include <lvgl.h>
 #include "lv_fs_cbfs.h"
 #if defined(ARDUINO) && !defined(ESP32)
 #include <avr/pgmspace.h>
