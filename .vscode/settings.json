@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "const_buffer_fs_drv.h": "c"
+        "const_buffer_fs_drv.h": "c",
+        "lv_fs_cbfs.h": "c"
     }
 }

@@ -10,7 +10,7 @@
 #include <lv_demo.h>
 #include "lv_fs_cbfs.h"
 #include "Ubuntu.hpp"
-#include "lv_ttf.h"
+#include "lv_tiny_ttf.h"
 /*Change to your screen resolution*/
 static const uint16_t screenWidth  = 240;
 static const uint16_t screenHeight = 135;
@@ -22,8 +22,7 @@ TFT_eSPI tft; /* TFT instance */
 
 lv_fs_file_t file;
 lv_style_t style;
-lv_font_t lfont;
-lv_ttf_t ttf;
+lv_tiny_ttf_font_t ttf;
 
 
 /* Display flushing */
@@ -81,19 +80,19 @@ void setup()
 #if 1
     const uint8_t* data = Ubuntu_data;
     const size_t data_size = sizeof(Ubuntu_data);
-    lv_fs_cbfs_init(0,'Q',data,data_size);
-    lv_fs_open(&file,"Q:/",LV_FS_MODE_RD);
-    lv_ttf_open(&ttf,&file);
-    // create a font with a line height of 40
-    lv_ttf_create_font(&lfont,&ttf,40,NULL);
-    // lv_style_init(&style);
-    //lv_style_set_text_font(&style, &font);  /*Set a larger font*/
-    /* Create simple label */
+    // initialize the const buffer filesystem (done once)
+    lv_fs_cbfs_init();
+    char path[256];
+    // create a path to the pointer
+    lv_fs_cbfs_create(path,sizeof(path),data,data_size);
+
+    // create a font with a line height of 40 from the path
+    // path can be a file, a cbfs pointer, etc.
+    lv_font_t* font = lv_tiny_ttf_create(path,40,NULL);
+    // create simple label
     lv_obj_t *label = lv_label_create( lv_scr_act() );
     lv_style_selector_t selector=0;
-
-    lv_obj_set_style_text_font(label,&lfont,selector);
-
+    lv_obj_set_style_text_font(label,font,selector);
     lv_label_set_text( label, "honey\nthe\nmonster");
     lv_obj_align( label, LV_ALIGN_CENTER, 0, 0 );
 #else
