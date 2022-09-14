@@ -22,7 +22,6 @@ TFT_eSPI tft; /* TFT instance */
 
 lv_fs_file_t file;
 lv_style_t style;
-lv_tiny_ttf_font_t ttf;
 
 
 /* Display flushing */
@@ -80,15 +79,10 @@ void setup()
 #if 1
     const uint8_t* data = Ubuntu_data;
     const size_t data_size = sizeof(Ubuntu_data);
-    // initialize the const buffer filesystem (done once)
-    lv_fs_cbfs_init();
-    char path[256];
-    // create a path to the pointer
-    lv_fs_cbfs_create(path,sizeof(path),data,data_size);
-
-    // create a font with a line height of 40 from the path
-    // path can be a file, a cbfs pointer, etc.
-    lv_font_t* font = lv_tiny_ttf_create(path,40,NULL);
+   
+    // create a font with a line height of 40 from the data
+    
+    lv_font_t* font = lv_tiny_ttf_create_data(data,data_size,40);
     // create simple label
     lv_obj_t *label = lv_label_create( lv_scr_act() );
     lv_style_selector_t selector=0;
